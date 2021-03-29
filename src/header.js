@@ -45,6 +45,10 @@ const header = () => {
       title: "Variant Inventory Qty"
     },
     {
+      id: "variant_inventory_tracker",
+      title: "Variant Inventory Tracker"
+    },
+    {
       id: "variant_price",
       title: "Variant Price"
     },

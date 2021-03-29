@@ -4,30 +4,21 @@ const csv = require("csv-parser");
 const fs = require("fs");
 const results = [];
 const createCsvWriter = require("csv-writer").createObjectCsvWriter;
-
 const header = require("./header");
-
-// console.log(header.header());
 
 fs.createReadStream("./ZORN_products_export.csv")
   .pipe(csv())
   .on("data", (data) => results.push(data))
   .on("end", () => {
-    // name !== null
-    // console.log(results[1]);
     console.log(results.length);
-
-    // let records = [{ handle: "" }];
     process(results);
-
-    // console.log(records);
   })
   .on("end", () => {
     console.log("CSV file successfully processed");
   });
 
 const process = (result) => {
-  let res = result.filter((r) => r.name !== "");
+  let res = result.filter((r) => r.name !== "" && r.size !== "");
   console.log(res.length);
   let records = [];
   res.sort();
@@ -48,6 +39,7 @@ const process = (result) => {
       variant_inventory_qty: data.qty,
       variant_price: data.price,
       variant_requires_shipping: "TRUE",
+      variant_inventory_tracker: "shopify",
       variant_taxable: "TRUE",
       variant_fulfillment_service: "manual",
       variant_grams: data.weight * 1000,
@@ -57,17 +49,15 @@ const process = (result) => {
       gift_card: "FALSE",
       image_src: data.image
     });
-    // recods[i].handle = createHandler(res[i].name);
   }
-  csvWriter
-    .writeRecords(records) // returns a promise
-    .then(() => {
-      console.log("...Done");
-    });
+  console.log(records);
+  csvWriter.writeRecords(records).then(() => {
+    console.log("...Done");
+  });
 };
 
 const csvWriter = createCsvWriter({
-  path: "src/test.csv",
+  path: "result.csv",
   header: header.header()
 });
 
