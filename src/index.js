@@ -3,8 +3,9 @@ const http = require("http");
 const csv = require("csv-parser");
 const fs = require("fs");
 const results = [];
+const createCsvWriter = require("csv-writer").createObjectCsvWriter;
 
-// const header = require("./header");
+const header = require("./header");
 
 // console.log(header.header());
 
@@ -37,17 +38,38 @@ const process = (result) => {
       handle: createHandler(data.sku),
       title: createTitle(data.name),
       variant_sku: data.sku,
+      body: data.description,
       vendor: "mariesaintpierre",
       published: "FALSE",
       option1_name: "Size",
       option1_value: data.size,
+      option2_name: "Color",
+      option2_value: data.color,
       variant_inventory_qty: data.qty,
-      variant_price: data.price
+      variant_price: data.price,
+      variant_requires_shipping: "TRUE",
+      variant_taxable: "TRUE",
+      variant_fulfillment_service: "manual",
+      variant_grams: data.weight * 1000,
+      variant_weight_unit: "g",
+      status: "draft",
+      seo_title: createTitle(data.name),
+      gift_card: "FALSE",
+      image_src: data.image
     });
     // recods[i].handle = createHandler(res[i].name);
   }
-  console.log(records);
+  csvWriter
+    .writeRecords(records) // returns a promise
+    .then(() => {
+      console.log("...Done");
+    });
 };
+
+const csvWriter = createCsvWriter({
+  path: "src/test.csv",
+  header: header.header()
+});
 
 const createHandler = (sku) => {
   let last = sku.lastIndexOf("-");
@@ -57,11 +79,6 @@ const createHandler = (sku) => {
 const createTitle = (rawName) => {
   let first = rawName.lastIndexOf("-");
   return first === -1 ? rawName : rawName.substring(0, first);
-};
-
-const getSize = (sku) => {
-  let last = sku.lastIndexOf("-");
-  return last === -1 ? "" : sku.substring(last + 1, sku.length);
 };
 
 http

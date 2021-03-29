@@ -1,50 +1,90 @@
 const header = () => {
-  return {
-    handle: "Handle",
-    title: "title",
-    body: "Body (HTML)",
-    vendor: "Vendor",
-    type: "Type",
-    tags: "Tags",
-    published: "Published",
-    option1_name: "Option1 Name",
-    option1_value: "Option2 Value",
-    option2_name: "Option2 Name",
-    option2_value: "Option2 Value",
-    option3_name: "Option3 Name",
-    option3_value: "Option3 Value",
-    variant_sku: "Variant SKU",
-    variant_grams: "Variant Grams",
-    variant_inventory: "Variant Inventory Tracker",
-    variant_inventory_qty: "Variant Inventory Qty",
-    variant_inventory_policy: "Variant Inventory Policy",
-    variant_fulfillment_service: "Variant Fulfillment Service",
-    variant_price: "Variant Price",
-    variant_compate_at_price: "Variant Compare At Price",
-    variant_requires_shipping: "Variant Requires Shipping",
-    variant_taxable: "Variant Taxable",
-    variant_barcode: "Variant Barcode",
-    image_src: "Image Src",
-    image_position: "Image Position",
-    image_alt_text: "Image Alt Text",
-    gift_card: "Gift Card",
-    seo_title: "SEO Title",
-    seo_description: "SEO Description",
-    google_shopping_product_category:
-      "Google Shopping / Google Product Category",
-    google_shopping_gender: "Google Shopping / Gender",
-    google_shopping_age_group: "Google Shopping / Age Group",
-    google_shopping_mpn: "Google Shopping / MPN",
-    google_shopping_adwords_grouping: "Google Shopping / AdWords Grouping",
-    google_shopping_adwords_label: "Google Shopping / AdWords Labels",
-    google_shopping_condition: "Google Shopping / Condition",
-    google_shopping_custom_products: "Google Shopping / Custom Product",
-    variant_image: "Variant Image",
-    variant_weight_unit: "Variant Weight Unit",
-    variant_tax_code: "Variant Tax Code",
-    cost_per_item: "Cost per item",
-    status: "Status"
-  };
+  return [
+    {
+      id: "handle",
+      title: "Handle"
+    },
+    {
+      id: "title",
+      title: "title"
+    },
+    {
+      id: "variant_sku",
+      title: "Variant SKU"
+    },
+    {
+      id: "body",
+      title: "Body (HTML)"
+    },
+    {
+      id: "vendor",
+      title: "Vendor"
+    },
+    {
+      id: "published",
+      title: "Published"
+    },
+    {
+      id: "option1_name",
+      title: "Option1 Name"
+    },
+    {
+      id: "option1_value",
+      title: "Option1 Value"
+    },
+    {
+      id: "option2_name",
+      title: "Option2 Name"
+    },
+    {
+      id: "option2_value",
+      title: "Option2 Value"
+    },
+    {
+      id: "variant_inventory_qty",
+      title: "Variant Inventory Qty"
+    },
+    {
+      id: "variant_price",
+      title: "Variant Price"
+    },
+    {
+      id: "variant_requires_shipping",
+      title: "Variant Requires Shipping"
+    },
+    {
+      id: "variant_taxable",
+      title: "Variant Taxable"
+    },
+    {
+      id: "variant_fulfillment_service",
+      title: "Variant Fulfillment Service"
+    },
+    {
+      id: "variant_grams",
+      title: "Variant Grams"
+    },
+    {
+      id: "variant_weight_unit",
+      title: "Variant Weight Unit"
+    },
+    {
+      id: "status",
+      title: "Status"
+    },
+    {
+      id: "seo_title",
+      title: "SEO Title"
+    },
+    {
+      id: "gift_card",
+      title: "Gift Card"
+    },
+    {
+      id: "image_src",
+      title: "Image Src"
+    }
+  ];
 };
 
 exports.header = header;
