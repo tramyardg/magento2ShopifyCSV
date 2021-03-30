@@ -6,7 +6,7 @@ const results = [];
 const createCsvWriter = require("csv-writer").createObjectCsvWriter;
 const header = require("./header");
 
-fs.createReadStream("./ZORN_products_export.csv")
+fs.createReadStream("../ZORN_products_export.csv")
   .pipe(csv())
   .on("data", (data) => results.push(data))
   .on("end", () => {
@@ -22,6 +22,9 @@ const process = (result) => {
   console.log(res.length);
   let records = [];
   res.sort();
+  res.sort(function(a, b) {
+    return a.color - b.color;
+  });
   for (let i = 0; i < res.length; i++) {
     // res[i].name = createHandler(res[i].name);
     let data = res[i];
@@ -47,18 +50,18 @@ const process = (result) => {
       status: "draft",
       seo_title: createTitle(data.name),
       gift_card: "FALSE",
-      image_src: data.image
+      image_src: data.image,
     });
   }
-  console.log(records);
+  console.log(res);
   csvWriter.writeRecords(records).then(() => {
     console.log("...Done");
   });
 };
 
 const csvWriter = createCsvWriter({
-  path: "result.csv",
-  header: header.header()
+  path: "../result.csv",
+  header: header.header(),
 });
 
 const createHandler = (sku) => {
