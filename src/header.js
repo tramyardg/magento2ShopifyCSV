@@ -87,6 +87,10 @@ const header = () => {
     {
       id: "image_src",
       title: "Image Src"
+    },
+    {
+      id: "image_position",
+      title: "Image Position"
     }
   ];
 };

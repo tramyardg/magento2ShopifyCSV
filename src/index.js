@@ -18,15 +18,19 @@ fs.createReadStream("../ZORN_products_export.csv")
   });
 
 const process = (result) => {
+  let main = result.filter((r) => r.name === "" && r.size === "");
+  // console.log(main);
+  // console.log(main.length)
+
   let res = result.filter((r) => r.name !== "" && r.size !== "");
   console.log(res.length);
   let records = [];
   res.sort();
   res.sort(function(a, b) {
-    return a.color - b.color;
+    return a.sku - b.sku;
   });
+
   for (let i = 0; i < res.length; i++) {
-    // res[i].name = createHandler(res[i].name);
     let data = res[i];
     records.push({
       handle: createHandler(data.sku),
@@ -49,11 +53,16 @@ const process = (result) => {
       variant_weight_unit: "g",
       status: "draft",
       seo_title: createTitle(data.name),
-      gift_card: "FALSE",
-      image_src: data.image,
+      gift_card: "FALSE"
     });
+    
+    records[i].image_src = "https://shop.mariesaintpierre.com/media/catalog/product"+
+    createImageSrc(main, records[i])[Math.floor(Math.random() * createImageSrc(main, records[i]).length - 1)+ 1]._image_src;
+    // console.log(records[i].image_src)
+    records[i].image_position = createImageSrc(main, records[i])[0]._image_position;
+    
   }
-  console.log(res);
+  console.log(records);
   csvWriter.writeRecords(records).then(() => {
     console.log("...Done");
   });
@@ -63,6 +72,20 @@ const csvWriter = createCsvWriter({
   path: "../result.csv",
   header: header.header(),
 });
+
+
+const createImageSrc = (main, records) => {
+  let larr = main.filter(r => r.sku === records.handle);
+  let arr = [];
+  for (let i = 0; i < larr.length; i++) { 
+    arr.push({
+      _image_src: larr[i]._media_image,
+      _image_position: larr[i]._media_position
+    });
+  }
+  // console.log(arr);
+  return arr;
+}  
 
 const createHandler = (sku) => {
   let last = sku.lastIndexOf("-");
