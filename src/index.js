@@ -6,7 +6,7 @@ const results = [];
 const createCsvWriter = require("csv-writer").createObjectCsvWriter;
 const header = require("./header");
 
-fs.createReadStream("../ZORN_products_export.csv")
+fs.createReadStream("../ABACO_JACKET.csv")
   .pipe(csv())
   .on("data", (data) => results.push(data))
   .on("end", () => {
@@ -22,10 +22,9 @@ const process = (result) => {
   // console.log(main);
   // console.log(main.length)
 
-  let res = result.filter((r) => r.name !== "" && r.size !== "");
+  let res = result.filter((r) => r.name !== "" && r.size !== "" && r.color !== "");
   console.log(res.length);
   let records = [];
-  res.sort();
   res.sort(function(a, b) {
     return a.sku - b.sku;
   });
@@ -33,7 +32,7 @@ const process = (result) => {
   for (let i = 0; i < res.length; i++) {
     let data = res[i];
     records.push({
-      handle: createHandler(data.sku),
+      handle: "abaco",
       title: createTitle(data.name),
       variant_sku: data.sku,
       body: data.description,
@@ -75,7 +74,11 @@ const csvWriter = createCsvWriter({
 
 
 const createImageSrc = (main, records) => {
-  let larr = main.filter(r => r.sku === records.handle);
+  let larr = main.filter(
+    (r) =>
+      r.sku.substring(0, r.sku.indexOf("-")) ===
+      records.variant_sku.substring(0, records.variant_sku.indexOf("-"))
+  );
   let arr = [];
   for (let i = 0; i < larr.length; i++) { 
     arr.push({
@@ -83,7 +86,7 @@ const createImageSrc = (main, records) => {
       _image_position: larr[i]._media_position
     });
   }
-  // console.log(arr);
+  console.log(arr);
   return arr;
 }  
 
