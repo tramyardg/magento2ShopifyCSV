@@ -1,16 +1,18 @@
-const http = require("http");
-
 const csv = require("csv-parser");
 const fs = require("fs");
 const results = [];
 const createCsvWriter = require("csv-writer").createObjectCsvWriter;
 const header = require("./header");
 
-fs.createReadStream("../ABACO_JACKET.csv")
+const params = {
+  importFileName: "CYDNIDE",
+  resultFileName: "CYDNIDE",
+};
+
+fs.createReadStream(`../import/${params.importFileName}.csv`)
   .pipe(csv())
   .on("data", (data) => results.push(data))
   .on("end", () => {
-    console.log(results.length);
     process(results);
   })
   .on("end", () => {
@@ -22,17 +24,19 @@ const process = (result) => {
   // console.log(main);
   // console.log(main.length)
 
-  let res = result.filter((r) => r.name !== "" && r.size !== "" && r.color !== "");
-  console.log(res.length);
+  let res = result.filter(
+    (r) => r.name !== "" && r.size !== "" && r.color !== ""
+  );
+  // console.log(res.length);
   let records = [];
-  res.sort(function(a, b) {
+  res.sort(function (a, b) {
     return a.sku - b.sku;
   });
 
   for (let i = 0; i < res.length; i++) {
     let data = res[i];
     records.push({
-      handle: "abaco",
+      handle: params.importFileName.toLowerCase(),
       title: createTitle(data.name),
       variant_sku: data.sku,
       body: data.description,
@@ -50,16 +54,24 @@ const process = (result) => {
       variant_fulfillment_service: "manual",
       variant_grams: data.weight * 1000,
       variant_weight_unit: "g",
-      status: "draft",
+      status: "active",
       seo_title: createTitle(data.name),
-      gift_card: "FALSE"
+      gift_card: "FALSE",
+      collection: data.subtitle,
     });
-    
-    records[i].image_src = "https://shop.mariesaintpierre.com/media/catalog/product"+
-    createImageSrc(main, records[i])[Math.floor(Math.random() * createImageSrc(main, records[i]).length - 1)+ 1]._image_src;
+
+    records[i].image_src =
+      "https://shop.mariesaintpierre.com/media/catalog/product" +
+      createImageSrc(main, records[i])[
+        Math.floor(
+          Math.random() * createImageSrc(main, records[i]).length - 1
+        ) + 1
+      ]._image_src;
     // console.log(records[i].image_src)
-    records[i].image_position = createImageSrc(main, records[i])[0]._image_position;
-    
+    records[i].image_position = createImageSrc(
+      main,
+      records[i]
+    )[0]._image_position;
   }
   console.log(records);
   csvWriter.writeRecords(records).then(() => {
@@ -68,10 +80,9 @@ const process = (result) => {
 };
 
 const csvWriter = createCsvWriter({
-  path: "../result.csv",
+  path: `../results/${params.resultFileName}_result.csv`,
   header: header.header(),
 });
-
 
 const createImageSrc = (main, records) => {
   let larr = main.filter(
@@ -80,15 +91,15 @@ const createImageSrc = (main, records) => {
       records.variant_sku.substring(0, records.variant_sku.indexOf("-"))
   );
   let arr = [];
-  for (let i = 0; i < larr.length; i++) { 
+  for (let i = 0; i < larr.length; i++) {
     arr.push({
       _image_src: larr[i]._media_image,
-      _image_position: larr[i]._media_position
+      _image_position: larr[i]._media_position,
     });
   }
-  console.log(arr);
+  // console.log(arr);
   return arr;
-}  
+};
 
 const createHandler = (sku) => {
   let last = sku.lastIndexOf("-");
@@ -99,10 +110,3 @@ const createTitle = (rawName) => {
   let first = rawName.lastIndexOf("-");
   return first === -1 ? rawName : rawName.substring(0, first);
 };
-
-http
-  .createServer(function (req, res) {
-    res.write("Hello World!"); //write a response to the client
-    res.end(); //end the response
-  })
-  .listen(8080); //the server object listens on port 8080

@@ -85,6 +85,10 @@ const header = () => {
       title: "Gift Card"
     },
     {
+      id: "collection",
+      title: "Collection"
+    },
+    {
       id: "image_src",
       title: "Image Src"
     },
