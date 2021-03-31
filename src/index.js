@@ -1,33 +1,33 @@
 const csv = require("csv-parser");
+const createCsvWriter = require("csv-writer").createObjectCsvWriter;
 const fs = require("fs");
 const results = [];
-const createCsvWriter = require("csv-writer").createObjectCsvWriter;
 const header = require("./header");
+const MAGENTO_IMAGE_LOCATION_URI = "https://shop.mariesaintpierre.com/media/catalog/product";
+const FILES_TO_IMPORT_PATH = "../import/TODO";
 
-const params = {
-  importFileName: "CYDNIDE",
-  resultFileName: "CYDNIDE",
-};
-
-fs.createReadStream(`../import/${params.importFileName}.csv`)
-  .pipe(csv())
-  .on("data", (data) => results.push(data))
-  .on("end", () => {
-    process(results);
-  })
-  .on("end", () => {
-    console.log("CSV file successfully processed");
-  });
-
+fs.readdir(FILES_TO_IMPORT_PATH, async (err, files) => {
+  if (err) console.log(err);
+  else {
+    console.log("\nCurrent directory filenames:");
+    files.forEach((file) => {
+      fs.createReadStream(`${FILES_TO_IMPORT_PATH}/${file}`)
+        .pipe(csv())
+        .on("data", (data) => results.push(data))
+        .on("end", () => {
+          process(results);
+        })
+        .on("end", () => {
+          console.log("CSV file successfully processed");
+        });
+    });
+  }
+});
 const process = (result) => {
   let main = result.filter((r) => r.name === "" && r.size === "");
-  // console.log(main);
-  // console.log(main.length)
-
   let res = result.filter(
     (r) => r.name !== "" && r.size !== "" && r.color !== ""
   );
-  // console.log(res.length);
   let records = [];
   res.sort(function (a, b) {
     return a.sku - b.sku;
@@ -36,7 +36,7 @@ const process = (result) => {
   for (let i = 0; i < res.length; i++) {
     let data = res[i];
     records.push({
-      handle: params.importFileName.toLowerCase(),
+      handle: createTitle(data.name),
       title: createTitle(data.name),
       variant_sku: data.sku,
       body: data.description,
@@ -60,27 +60,18 @@ const process = (result) => {
       collection: data.subtitle,
     });
 
-    records[i].image_src =
-      "https://shop.mariesaintpierre.com/media/catalog/product" +
-      createImageSrc(main, records[i])[
-        Math.floor(
-          Math.random() * createImageSrc(main, records[i]).length - 1
-        ) + 1
-      ]._image_src;
-    // console.log(records[i].image_src)
-    records[i].image_position = createImageSrc(
-      main,
-      records[i]
-    )[0]._image_position;
+    // let imgSrc = MAGENTO_IMAGE_LOCATION_URI + createImageSrc(main, records[i])[0]._image_src;
+    // let imgPos = createImageSrc(main, records[i])[0]._image_position;
+    // records[i].image_src = imgSrc;
+    // records[i].image_position = imgPos;
   }
-  console.log(records);
+  // console.log(records);
   csvWriter.writeRecords(records).then(() => {
     console.log("...Done");
   });
 };
-
 const csvWriter = createCsvWriter({
-  path: `../results/${params.resultFileName}_result.csv`,
+  path: `../results/test1_result.csv`,
   header: header.header(),
 });
 
@@ -99,11 +90,6 @@ const createImageSrc = (main, records) => {
   }
   // console.log(arr);
   return arr;
-};
-
-const createHandler = (sku) => {
-  let last = sku.lastIndexOf("-");
-  return last === -1 ? sku : sku.substring(0, last);
 };
 
 const createTitle = (rawName) => {
