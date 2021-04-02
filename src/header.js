@@ -6,7 +6,7 @@ const header = () => {
     },
     {
       id: "title",
-      title: "title"
+      title: "Title"
     },
     {
       id: "variant_sku",

@@ -3,7 +3,8 @@ const createCsvWriter = require("csv-writer").createObjectCsvWriter;
 const fs = require("fs");
 const results = [];
 const header = require("./header");
-const MAGENTO_IMAGE_LOCATION_URI = "https://shop.mariesaintpierre.com/media/catalog/product";
+const MAGENTO_IMAGE_LOCATION_URI =
+  "https://shop.mariesaintpierre.com/media/catalog/product";
 const FILES_TO_IMPORT_PATH = "../import/TODO";
 
 fs.readdir(FILES_TO_IMPORT_PATH, async (err, files) => {
@@ -24,19 +25,22 @@ fs.readdir(FILES_TO_IMPORT_PATH, async (err, files) => {
   }
 });
 const process = (result) => {
-  let main = result.filter((r) => r.name === "" && r.size === "");
-  let res = result.filter(
-    (r) => r.name !== "" && r.size !== "" && r.color !== ""
-  );
-  let records = [];
-  res.sort(function (a, b) {
-    return a.sku - b.sku;
+  let main = result.filter((r) => r.size === "" 
+  && r.image !== "" 
+  && r.small_image !== "" 
+  && r.thumbnail !== "" 
+  && r.has_options === "1");
+
+  let simple = result.filter((r) => r.name !== "" && r.size !== "" && r.color !== "");
+  simple.sort(function(a, b) {
+    return a.sku.localeCompare(b.sku);
   });
 
-  for (let i = 0; i < res.length; i++) {
-    let data = res[i];
+  let records = [];
+  for (let i = 0; i < simple.length; i++) {
+    let data = simple[i];
     records.push({
-      handle: createTitle(data.name),
+      handle: createTitle(data.name).toLowerCase(),
       title: createTitle(data.name),
       variant_sku: data.sku,
       body: data.description,
@@ -59,38 +63,31 @@ const process = (result) => {
       gift_card: "FALSE",
       collection: data.subtitle,
     });
-
-    // let imgSrc = MAGENTO_IMAGE_LOCATION_URI + createImageSrc(main, records[i])[0]._image_src;
-    // let imgPos = createImageSrc(main, records[i])[0]._image_position;
-    // records[i].image_src = imgSrc;
-    // records[i].image_position = imgPos;
   }
-  // console.log(records);
   csvWriter.writeRecords(records).then(() => {
     console.log("...Done");
   });
 };
+
 const csvWriter = createCsvWriter({
   path: `../results/test1_result.csv`,
   header: header.header(),
 });
 
-const createImageSrc = (main, records) => {
-  let larr = main.filter(
-    (r) =>
-      r.sku.substring(0, r.sku.indexOf("-")) ===
-      records.variant_sku.substring(0, records.variant_sku.indexOf("-"))
-  );
-  let arr = [];
-  for (let i = 0; i < larr.length; i++) {
-    arr.push({
-      _image_src: larr[i]._media_image,
-      _image_position: larr[i]._media_position,
-    });
-  }
-  // console.log(arr);
-  return arr;
-};
+// const createImageSrc = (data, main) => {
+//   let trimSkuData = data.sku.substring(0, data.sku.lastIndexOf("-"));
+//   let mainFilter = main.filter((m) => m.sku === trimSkuData); // this will return the row with images
+//   let imageSrc;
+//   if (mainFilter.length > 0) {
+//     const { small_image, image, thumbnail } = mainFilter[0];
+//     if (small_image !== "" && image !== "" && thumbnail !== "") {
+//       imageSrc = magentoImageLink(image);
+//     }
+//   }
+//   return imageSrc;
+// };
+
+// const magentoImageLink = (imgPath) => MAGENTO_IMAGE_LOCATION_URI + imgPath;
 
 const createTitle = (rawName) => {
   let first = rawName.lastIndexOf("-");
