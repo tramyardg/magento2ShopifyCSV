@@ -8,7 +8,8 @@
   },
   "dependencies": {
     "csv-parser": "^3.0.0",
-    "csv-writer": "^1.6.0"
+    "csv-writer": "^1.6.0",
+    "utf8": "^3.0.0"
   },
   "devDependencies": {
     "nodemon": "1.18.4"
