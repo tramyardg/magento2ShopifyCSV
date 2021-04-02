@@ -2,7 +2,7 @@ const csv = require("csv-parser");
 const createCsvWriter = require("csv-writer").createObjectCsvWriter;
 const fs = require("fs");
 const header = require("./header");
-const utf8 = require('utf8');
+const utf8 = require("utf8");
 
 const CUSTOMERS_TO_IMPORT = "../../import/magento_customers_sample.csv";
 const RESULT_PATH = `../../results/shopify_customers_sample.csv`;
@@ -11,24 +11,29 @@ class CustomerImport {
   constructor() {
     this.importFile = CUSTOMERS_TO_IMPORT;
     this.resultPath = RESULT_PATH;
+    this.results = [];
   }
 
-  extract = () => {
-    if (!this.isFileExists()) {
-      console.log("The file does not exist.");
-      process.exit();
-    }
+  process = () => {
+    this.validateImportFileExists();
     let rawData = [];
-    fs.createReadStream(CUSTOMERS_TO_IMPORT)
+    fs.createReadStream(this.importFile)
       .pipe(csv())
       .on("data", async (data) => rawData.push(data))
       .on("end", () => this.convert(rawData))
       .on("end", () => console.log("CSV file successfully processed"));
   };
 
-  isFileExists = () => fs.existsSync(CUSTOMERS_TO_IMPORT);
+  validateImportFileExists = () => {
+    if (!this.isFileExists()) {
+      console.log("The file does not exist.");
+      process.exit();
+    }
+  }
 
-  convert = (rawData) => {
+  isFileExists = () => fs.existsSync(this.importFile);
+
+  convert = async (rawData) => {
     const records = [];
     rawData.forEach((data) => {
       const {
@@ -67,17 +72,16 @@ class CustomerImport {
         tax_exempt: "no",
       });
     });
-    ;
-    this.writer().writeRecords(records).then(() => {
-      console.log("...Done");
-    });
+    this.write(records);
   };
 
-  writer = () => createCsvWriter({ path: RESULT_PATH, header: header.header });
-
-  run = () => {
-    this.extract();
+  write = (records) => {
+    createCsvWriter({ path: this.resultPath, header: header.header })
+      .writeRecords(records)
+      .then(() => console.log("...Done writing"));
   };
+
+  run = () => this.process();
 }
 
 new CustomerImport().run();
