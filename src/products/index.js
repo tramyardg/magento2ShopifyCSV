@@ -5,7 +5,7 @@ const results = [];
 const header = require("./header");
 const MAGENTO_IMAGE_LOCATION_URI =
   "https://shop.mariesaintpierre.com/media/catalog/product";
-const FILES_TO_IMPORT_PATH = "../import/TODO";
+const FILES_TO_IMPORT_PATH = "../../import/TODO";
 
 fs.readdir(FILES_TO_IMPORT_PATH, async (err, files) => {
   if (err) console.log(err);
@@ -72,8 +72,8 @@ const process = (result) => {
 };
 
 const csvWriter = createCsvWriter({
-  path: `../results/test1_result.csv`,
-  header: header.header(),
+  path: `../../results/test1_result.csv`,
+  header: header.header,
 });
 
 // const createImageSrc = (data, main) => {
