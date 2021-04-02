@@ -9,10 +9,6 @@ const header = () => {
       title: "Title"
     },
     {
-      id: "variant_sku",
-      title: "Variant SKU"
-    },
-    {
       id: "body",
       title: "Body (HTML)"
     },
@@ -39,6 +35,18 @@ const header = () => {
     {
       id: "option2_value",
       title: "Option2 Value"
+    },
+    {
+      id: "option3_name",
+      title: "Option3 Name"
+    },
+    {
+      id: "option3_value",
+      title: "Option3 Value"
+    },
+    {
+      id: "variant_sku",
+      title: "Variant SKU"
     },
     {
       id: "variant_inventory_qty",

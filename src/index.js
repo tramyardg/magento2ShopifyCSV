@@ -42,7 +42,6 @@ const process = (result) => {
     records.push({
       handle: createTitle(data.name).toLowerCase(),
       title: createTitle(data.name),
-      variant_sku: data.sku,
       body: data.description,
       vendor: "mariesaintpierre",
       published: "FALSE",
@@ -50,6 +49,9 @@ const process = (result) => {
       option1_value: data.size,
       option2_name: "Color",
       option2_value: data.color,
+      option3_name: "",
+      option3_value: "",
+      variant_sku: data.sku,
       variant_inventory_qty: data.qty,
       variant_price: data.price,
       variant_requires_shipping: "TRUE",
