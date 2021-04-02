@@ -79,8 +79,7 @@ class CustomerImport {
   };
 
   getCountryName = (code) => {
-    const isValid = countries.isValid(code);
-    return isValid
+    return countries.isValid(code)
       ? countries.getName(code, "en", { select: "official" })
       : code;
   };
