@@ -1,12 +1,11 @@
 const csv = require("csv-parser");
 const createCsvWriter = require("csv-writer").createObjectCsvWriter;
 const fs = require("fs");
-const utf8 = require("utf8");
 const header = require("./header");
 const countries = require("i18n-iso-countries");
 
-const CUSTOMERS_TO_IMPORT = "../../import/magento_customers_sample.csv";
-const RESULT_PATH = `../../results/shopify_customers_sample.csv`;
+const CUSTOMERS_TO_IMPORT = "../../import/customers_exports_p3.csv";
+const RESULT_PATH = `../../results/shopify_customers_to_import.csv`;
 
 class CustomerImport {
   constructor() {
@@ -19,7 +18,7 @@ class CustomerImport {
     let rawData = [];
     fs.createReadStream(this.importFile)
       .pipe(csv())
-      .on("data", async (data) => rawData.push(data))
+      .on("data", (data) => rawData.push(data))
       .on("end", () => this.convert(rawData))
       .on("end", () => console.log("CSV file successfully processed"));
   };
@@ -32,8 +31,6 @@ class CustomerImport {
   };
 
   isFileExists = () => fs.existsSync(this.importFile);
-
-  decode = (data) => utf8.decode(data);
 
   convert = async (rawData) => {
     const records = [];
@@ -54,19 +51,19 @@ class CustomerImport {
       } = data;
       const _t = this;
       records.push({
-        first_name: _t.decode(firstname),
-        last_name: _t.decode(lastname),
-        email: _t.decode(email),
-        company: _t.decode(billing_company),
-        address1: _t.decode(billing_street1),
-        address2: billing_street2,
-        city: _t.decode(billing_city),
-        province: _t.decode(billing_region),
+        first_name: firstname,
+        last_name: lastname,
+        email: email,
+        company: billing_company !== "" ? billing_company : "",
+        address1: billing_street1 !== "" ? billing_street1 : "",
+        address2: billing_street2 !== "" ? billing_street2 : "",
+        city: billing_city !== "" ? billing_city : "",
+        province: billing_region !== "" ? billing_region : "",
         province_code: "",
-        country: _t.getCountryName(billing_country),
-        country_code: billing_country,
-        zip: billing_postcode,
-        phone: billing_telephone,
+        country: billing_country !== "" ? billing_country : "",
+        country_code: billing_country !== "" ? billing_country : "",
+        zip: billing_postcode !== "" ? billing_postcode : "",
+        phone: billing_telephone !== "" ? billing_telephone : "",
         accepts_marketing: is_subscribed === "0" ? "no" : "yes",
         total_spent: 0,
         total_orders: 0,
