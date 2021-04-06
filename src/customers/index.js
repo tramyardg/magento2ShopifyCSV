@@ -33,8 +33,11 @@ class CustomerImport {
   isFileExists = () => fs.existsSync(this.importFile);
 
   convert = async (rawData) => {
+    // you can set a limit so that you are not importing all customers
+    // however, if you want to process all just use rawData
+    let customers = rawData.slice(0, 10);
     const records = [];
-    rawData.forEach((data) => {
+    customers.forEach((data) => {
       const {
         email,
         firstname,
