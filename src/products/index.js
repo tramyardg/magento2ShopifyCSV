@@ -73,7 +73,7 @@ const process = (result) => {
       seo_title: createTitle(data.name),
       gift_card: "FALSE",
       collection: data.subtitle,
-      image_src: createImageSrc(data, main),
+      image_src: createImageSrc(data, configurable),
       tags: data.material + ", " + data.occasion,
     });
     custom_fields_records.push({
@@ -100,7 +100,7 @@ const process = (result) => {
       seo_title: createTitle(data.name),
       gift_card: "FALSE",
       collection: data.subtitle,
-      image_src: createImageSrc(data, main),
+      image_src: createImageSrc(data, configurable),
       p3_description_fr: "Description francaise",
     });
   }
@@ -142,8 +142,8 @@ const createTitle = (rawName) => {
 };
 
 const getTitle = (configurable, dataName) => {
-  let configName = configurable.filter(
-    (c) => c.name.split(" ")[0] === createTitle(dataName)
+  let configName = configurable.filter((c) =>
+    c.name.split(" ").includes(createTitle(dataName))
   );
   if (configName.length > 0) {
     return configName[0].name;
