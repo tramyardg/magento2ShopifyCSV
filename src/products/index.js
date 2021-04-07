@@ -6,7 +6,7 @@ const header = require("./header");
 const customFieldsHeader = require("./custom_fields_header");
 const MAGENTO_IMAGE_LOCATION_URI =
   "https://shop.mariesaintpierre.com/media/catalog/product";
-const FILES_TO_IMPORT_PATH = "../../import/TODO";
+const FILES_TO_IMPORT_PATH = "../../import/REDO";
 
 fs.readdir(FILES_TO_IMPORT_PATH, async (err, files) => {
   if (err) console.log(err);
@@ -67,6 +67,7 @@ const process = (result) => {
       gift_card: "FALSE",
       collection: data.subtitle,
       image_src: createImageSrc(data, main),
+      tags: data.material + ", " + data.occasion,
     });
     custom_fields_records.push({
       handle: createTitle(data.name).toLowerCase(),
@@ -99,9 +100,9 @@ const process = (result) => {
   csvWriter.writeRecords(records).then(() => {
     console.log("...Done");
   });
-  csvWriterCustomFields.writeRecords(custom_fields_records).then(() => {
-    console.log("...Custom fields records done");
-  });
+  // csvWriterCustomFields.writeRecords(custom_fields_records).then(() => {
+  //   console.log("...Custom fields records done");
+  // });
 };
 
 const csvWriter = createCsvWriter({
@@ -132,3 +133,5 @@ const createTitle = (rawName) => {
   let first = rawName.lastIndexOf("-");
   return first === -1 ? rawName : rawName.substring(0, first);
 };
+
+// color: Black, Green

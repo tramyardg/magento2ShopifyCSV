@@ -103,4 +103,8 @@ exports.header = [
     id: "image_position",
     title: "Image Position",
   },
+  {
+    id: "tags",
+    title: "tags"
+  }
 ];
