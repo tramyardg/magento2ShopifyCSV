@@ -6,7 +6,7 @@ const header = require("./header");
 const customFieldsHeader = require("./custom_fields_header");
 const MAGENTO_IMAGE_LOCATION_URI =
   "https://shop.mariesaintpierre.com/media/catalog/product";
-const FILES_TO_IMPORT_PATH = "../../import/REDO";
+const FILES_TO_IMPORT_PATH = "../../import/DONE";
 
 fs.readdir(FILES_TO_IMPORT_PATH, async (err, files) => {
   if (err) console.log(err);
@@ -26,14 +26,21 @@ fs.readdir(FILES_TO_IMPORT_PATH, async (err, files) => {
   }
 });
 const process = (result) => {
-  let main = result.filter((r) => r.size === "" 
-  && r.image !== "" 
-  && r.small_image !== "" 
-  && r.thumbnail !== "" 
-  && r.has_options === "1");
+  // is the main (root) product
+  let configurable = result.filter(
+    (r) =>
+      r.size === "" &&
+      r.image !== "" &&
+      r.small_image !== "" &&
+      r.thumbnail !== "" &&
+      r.has_options === "1"
+  );
 
-  let simple = result.filter((r) => r.name !== "" && r.size !== "" && r.color !== "");
-  simple.sort(function(a, b) {
+  // is it's variants products
+  let simple = result.filter(
+    (r) => r.name !== "" && r.size !== "" && r.color !== ""
+  );
+  simple.sort(function (a, b) {
     return a.sku.localeCompare(b.sku);
   });
 
@@ -42,9 +49,9 @@ const process = (result) => {
   for (let i = 0; i < simple.length; i++) {
     let data = simple[i];
     records.push({
-      handle: createTitle(data.name).toLowerCase(),
-      title: createTitle(data.name),
-      body: data.description,
+      handle: getTitle(configurable, data.name).toLowerCase(),
+      title: getTitle(configurable, data.name),
+      body: getCorrectDescription(configurable, data),
       vendor: "mariesaintpierre",
       published: "FALSE",
       option1_name: "Size",
@@ -132,6 +139,28 @@ const magentoImageLink = (imgPath) => MAGENTO_IMAGE_LOCATION_URI + imgPath;
 const createTitle = (rawName) => {
   let first = rawName.lastIndexOf("-");
   return first === -1 ? rawName : rawName.substring(0, first);
+};
+
+const getTitle = (configurable, dataName) => {
+  let configName = configurable.filter(
+    (c) => c.name.split(" ")[0] === createTitle(dataName)
+  );
+  if (configName.length > 0) {
+    return configName[0].name;
+  } else {
+    return createTitle(dataName);
+  }
+};
+
+const getCorrectDescription = (configurable, data) => {
+  let configName = configurable.filter(
+    (c) => c.name.split(" ")[0] === createTitle(data.name)
+  );
+  if (configName.length > 0) {
+    return configName[0].description;
+  } else {
+    return data.description;
+  }
 };
 
 // color: Black, Green
