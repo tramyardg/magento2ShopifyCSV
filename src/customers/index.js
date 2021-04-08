@@ -96,3 +96,9 @@ class CustomerImport {
 }
 
 new CustomerImport().run();
+
+// https://stackoverflow.com/questions/41758870/how-to-convert-result-table-to-json-array-in-mysql
+// SELECT CONCAT( '[', GROUP_CONCAT(JSON_OBJECT('emp_no', emp_no)), ']' ) FROM employees
+// SELECT json_object('emp_no', emp_no) FROM employees INTO OUTFILE 'passwd.json'
+//  Warning: #1287 '<select expression> INTO <destination>;' is deprecated and will be removed in a future release. Please use 'SELECT <select list> INTO <destination> FROM...' instead
+// C:\xampp\mysql\data\employees\passwd.json
