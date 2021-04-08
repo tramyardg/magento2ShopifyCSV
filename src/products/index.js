@@ -6,7 +6,7 @@ const header = require("./header");
 const customFieldsHeader = require("./custom_fields_header");
 const MAGENTO_IMAGE_LOCATION_URI =
   "https://shop.mariesaintpierre.com/media/catalog/product";
-const FILES_TO_IMPORT_PATH = "../../import/DONE";
+const FILES_TO_IMPORT_PATH = "../../import/TODO";
 
 fs.readdir(FILES_TO_IMPORT_PATH, async (err, files) => {
   if (err) console.log(err);
@@ -35,6 +35,10 @@ const process = (result) => {
       r.thumbnail !== "" &&
       r.has_options === "1"
   );
+
+  // rows that contains other images
+  let configurableImages = result.filter((r) => r.name === "" && !r._media_image.startsWith("/s/"));
+  let productImages = configurableImages.concat(configurable);
 
   // is it's variants products
   let simple = result.filter(
@@ -104,12 +108,43 @@ const process = (result) => {
       p3_description_fr: "Description francaise",
     });
   }
+
+  productImages.forEach((r) => {
+    records.push({
+      handle: r.name === "" ? configurable.filter(c => c.sku === r.sku)[0].name.toLowerCase() : r.name.toLowerCase(),
+      title: "",
+      body: "",
+      vendor: "",
+      published: "",
+      option1_name: "",
+      option1_value: "",
+      option2_name: "",
+      option2_value: "",
+      option3_name: "",
+      option3_value: "",
+      variant_sku: "",
+      variant_inventory_qty: "",
+      variant_price: "",
+      variant_requires_shipping: "",
+      variant_inventory_tracker: "",
+      variant_taxable: "",
+      variant_fulfillment_service: "",
+      variant_grams: "",
+      variant_weight_unit: "",
+      status: "",
+      seo_title: "",
+      gift_card: "",
+      collection: "",
+      image_src: r.small_image !== "" ? magentoImageLink(r.small_image) : magentoImageLink(r._media_image),
+      tags: "",
+    });
+  });
   csvWriter.writeRecords(records).then(() => {
     console.log("...Done");
   });
-  // csvWriterCustomFields.writeRecords(custom_fields_records).then(() => {
-  //   console.log("...Custom fields records done");
-  // });
+  csvWriterCustomFields.writeRecords(custom_fields_records).then(() => {
+    console.log("...Custom fields records done");
+  });
 };
 
 const csvWriter = createCsvWriter({
@@ -153,8 +188,8 @@ const getTitle = (configurable, dataName) => {
 };
 
 const getCorrectDescription = (configurable, data) => {
-  let configName = configurable.filter(
-    (c) => c.name.split(" ")[0] === createTitle(data.name)
+  let configName = configurable.filter((c) =>
+    c.name.split(" ").includes(createTitle(data.name))
   );
   if (configName.length > 0) {
     return configName[0].description;
