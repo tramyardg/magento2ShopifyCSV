@@ -57,7 +57,7 @@ const process = (result) => {
       title: getTitle(configurable, data.name),
       body: getCorrectDescription(configurable, data),
       vendor: "mariesaintpierre",
-      published: "FALSE",
+      published: "TRUE",
       option1_name: "Size",
       option1_value: data.size,
       option2_name: "Color",
