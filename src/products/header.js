@@ -104,6 +104,10 @@ exports.header = [
     title: "Image Position",
   },
   {
+    id: "variant_image",
+    title: "Variant Image"
+  },
+  {
     id: "tags",
     title: "tags"
   }

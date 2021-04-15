@@ -35,7 +35,7 @@ class CustomerImport {
   convert = async (rawData) => {
     // you can set a limit so that you are not importing all customers
     // however, if you want to process all just use rawData
-    let customers = rawData.slice(0, 10);
+    let customers = rawData.slice(0, 3);
     const records = [];
     customers.forEach((data) => {
       const {
@@ -68,14 +68,35 @@ class CustomerImport {
         zip: billing_postcode !== "" ? billing_postcode : "",
         phone: billing_telephone !== "" ? billing_telephone : "",
         accepts_marketing: is_subscribed === "0" ? "no" : "yes",
-        total_spent: 0,
-        total_orders: 0,
         tags: "",
         note: "",
         tax_exempt: "no",
       });
     });
-    this.write(records);
+
+    fs.readFile("magesales_flat_order.json", (err, data) => {
+      if (err) throw err;
+      let orders = JSON.parse(data);
+      let newRecords = [];
+      records.forEach(p => {
+        let filtered = orders.filter(r => r.customer_email === p.email);
+        let totalSpent = 0;
+        let totalNumberOfOrders = 0;
+        filtered.forEach(k => {
+          if (k.state !== "canceled") {
+            totalSpent += k.base_grand_total * 1;
+          }
+          totalNumberOfOrders++;
+        });
+        newRecords.push({
+          ...p,
+          total_spent: totalSpent+"",
+          total_orders: totalNumberOfOrders+""
+        });
+      });
+      this.write(newRecords);
+      // console.log(newRecords);
+    });
   };
 
   getCountryName = (code) => {
@@ -97,8 +118,18 @@ class CustomerImport {
 
 new CustomerImport().run();
 
-// https://stackoverflow.com/questions/41758870/how-to-convert-result-table-to-json-array-in-mysql
-// SELECT CONCAT( '[', GROUP_CONCAT(JSON_OBJECT('emp_no', emp_no)), ']' ) FROM employees
-// SELECT json_object('emp_no', emp_no) FROM employees INTO OUTFILE 'passwd.json'
-//  Warning: #1287 '<select expression> INTO <destination>;' is deprecated and will be removed in a future release. Please use 'SELECT <select list> INTO <destination> FROM...' instead
-// C:\xampp\mysql\data\employees\passwd.json
+// https://help.shopify.com/en/manual/customers/import-export-customers
+// https://community.shopify.com/c/Shopify-Discussion/Customers-CSV-Import-System-ignoring-Total-Spent-and-Total/td-p/138416
+// https://community.shopify.com/c/Shopify-Discussion/importing-total-order-and-total-spend-of-customer/td-p/766877
+/**
+ * Shopify Staff (Retired)
+ * ... these fields are calculated based on orders in the system and can't be overridden when importing existing customers.
+ */
+/**
+ * Some of your customers' information can't be transferred between platforms. 
+ * Shopify tracks only what customers order and spend through your online store. 
+ * It's not possible to import customer data for orders placed and money spent 
+ * on another store or ecommerce platform. You can’t edit the Total Spent 
+ * and Total Orders columns, as they represent what that customer has spent 
+ * and ordered from your online store.
+ */

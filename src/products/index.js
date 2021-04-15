@@ -7,6 +7,7 @@ const customFieldsHeader = require("./custom_fields_header");
 const MAGENTO_IMAGE_LOCATION_URI =
   "https://shop.mariesaintpierre.com/media/catalog/product";
 const FILES_TO_IMPORT_PATH = "../../import/TODO";
+const RESULT_CSV_FILE = "../../results/csv_to_import_shopify.csv";
 
 fs.readdir(FILES_TO_IMPORT_PATH, async (err, files) => {
   if (err) console.log(err);
@@ -37,7 +38,7 @@ const process = (result) => {
   );
 
   // rows that contains other images
-  let configurableImages = result.filter((r) => r.name === "" && !r._media_image.startsWith("/s/"));
+  let configurableImages = result.filter((r) => r.name === "");
   let productImages = configurableImages.concat(configurable);
 
   // is it's variants products
@@ -78,6 +79,7 @@ const process = (result) => {
       gift_card: "FALSE",
       collection: data.subtitle,
       image_src: createImageSrc(data, configurable),
+      variant_image: createImageSrc(data, configurable),
       tags: data.material + ", " + data.occasion,
     });
     custom_fields_records.push({
@@ -108,6 +110,9 @@ const process = (result) => {
       p3_description_fr: "Description francaise",
     });
   }
+  // console.log(configurable);
+  // console.log(productImages[productImages.length - 1]);
+  // productImages.forEach(r => console.log(r.name, r.sku));
 
   productImages.forEach((r) => {
     records.push({
@@ -136,19 +141,20 @@ const process = (result) => {
       gift_card: "",
       collection: "",
       image_src: r.small_image !== "" ? magentoImageLink(r.small_image) : magentoImageLink(r._media_image),
+      variant_image: "",
       tags: "",
     });
   });
   csvWriter.writeRecords(records).then(() => {
     console.log("...Done");
   });
-  csvWriterCustomFields.writeRecords(custom_fields_records).then(() => {
-    console.log("...Custom fields records done");
-  });
+  // csvWriterCustomFields.writeRecords(custom_fields_records).then(() => {
+  //   console.log("...Custom fields records done");
+  // });
 };
 
 const csvWriter = createCsvWriter({
-  path: `../../results/shopify_import_products.csv`,
+  path: RESULT_CSV_FILE,
   header: header.header,
 });
 
