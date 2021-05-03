@@ -2,3 +2,4 @@
 /*.csv
 /results
 /import
+.env
